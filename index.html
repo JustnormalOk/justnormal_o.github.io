@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Epic Screen Share </title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        button {
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #share-btn {
+            background: gray;
+            color: #fff;
+        }
+        #share-btn.active {
+            background: green;
+        }
+        #randomize-btn {
+            background: #ff6f61;
+            color: #fff;
+        }
+        #randomize-btn:hover {
+            background: #ff3d2e;
+        }
+        video {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        #notice {
+            margin-top: 20px;
+            font-size: 12px;
+            color: gray;
+        }
+        #duration {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>🔥 Epic Screen Share 🔥</h1>
+        <button id="randomize-btn" onclick="randomizeUser()">Randomize to Find Random</button>
+        <p id="status">Not connected</p>
+        <button id="share-btn" disabled>Share Screen</button>
+        <video id="screen-video" autoplay playsinline></video>
+        <p id="duration">00:00</p>
+        <p id="notice">Note: We will NOT collect personal sharing and NO restrictions around here. So please, be careful what you are looking for.</p>
+    </div>
+
+    <script>
+        let connected = false;
+        let shareBtn = document.getElementById("share-btn");
+        let statusText = document.getElementById("status");
+        let durationText = document.getElementById("duration");
+        let duration = 0;
+
+        // Function to randomize and connect users
+        function randomizeUser() {
+            if (Math.random() > 0.5) {
+                connected = true;
+                statusText.textContent = "Connected";
+                shareBtn.classList.add("active");
+                shareBtn.disabled = false;
+            } else {
+                connected = false;
+                statusText.textContent = "Not connected";
+                shareBtn.classList.remove("active");
+                shareBtn.disabled = true;
+            }
+        }
+
+        // Function to start screen sharing
+        async function startScreenShare() {
+            if (!connected) return;
+
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const videoElement = document.getElementById('screen-video');
+                videoElement.srcObject = stream;
+
+                // Start duration timer
+                duration = 0;
+                setInterval(() => {
+                    duration++;
+                    let minutes = String(Math.floor(duration / 60)).padStart(2, '0');
+                    let seconds = String(duration % 60).padStart(2, '0');
+                    durationText.textContent = `${minutes}:${seconds}`;
+                }, 1000);
+            } catch (error) {
+                alert('Screen share failed: ' + error.message);
+            }
+        }
+
+        // Attach event to the Share button
+        shareBtn.addEventListener("click", startScreenShare);
+    </script>
+</body>
+</html>
